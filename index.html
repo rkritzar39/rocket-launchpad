@@ -1,1 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
 
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <meta
+        name="description"
+        content="Rocket Launchpad is an unofficial personal dashboard for University of Toledo students."
+    >
+
+    <meta name="theme-color" content="#153f8f">
+
+    <title>Rocket Launchpad</title>
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <div class="app-shell">
+        <header class="topbar">
+            <div class="topbar__brand">
+                <button
+                    id="menu-button"
+                    class="icon-button mobile-menu-button"
+                    type="button"
+                    aria-label="Open navigation"
+                    aria-expanded="false"
+                    aria-controls="sidebar"
+                >
+                    <span aria-hidden="true">☰</span>
+                </button>
+
+                <a href="#" class="brand-link">
+                    <span class="brand__icon" aria-hidden="true">🚀</span>
+
+                    <span class="brand__text">
+                        <strong>Rocket Launchpad</strong>
+                        <small>Unofficial student dashboard</small>
+                    </span>
+                </a>
+            </div>
+
+            <div class="topbar__actions">
+                <label class="desktop-search" for="desktop-search">
+                    <span class="visually-hidden">Search links</span>
+
+                    <span class="search-icon" aria-hidden="true">⌕</span>
+
+                    <input
+                        id="desktop-search"
+                        class="search-input"
+                        type="search"
+                        placeholder="Search your links..."
+                        autocomplete="off"
+                    >
+                </label>
+
+                <button
+                    id="theme-button"
+                    class="icon-button"
+                    type="button"
+                    aria-label="Switch to dark mode"
+                    title="Change theme"
+                >
+                    <span id="theme-button-icon" aria-hidden="true">🌙</span>
+                </button>
+
+                <button
+                    id="add-link-button"
+                    class="primary-button"
+                    type="button"
+                >
+                    <span aria-hidden="true">＋</span>
+                    <span>Add link</span>
+                </button>
+            </div>
+        </header>
+
+        <aside id="sidebar" class="sidebar" aria-label="Primary navigation">
+            <nav class="navigation">
+                <button
+                    class="navigation__item navigation__item--active"
+                    type="button"
+                    data-view="home"
+                >
+                    <span aria-hidden="true">⌂</span>
+                    <span>Home</span>
+                </button>
+
+                <button
+                    class="navigation__item"
+                    type="button"
+                    data-view="links"
+                >
+                    <span aria-hidden="true">🔗</span>
+                    <span>All links</span>
+                </button>
+
+                <button
+                    class="navigation__item"
+                    type="button"
+                    data-view="tasks"
+                >
+                    <span aria-hidden="true">✓</span>
+                    <span>Tasks</span>
+                </button>
+
+                <button
+                    class="navigation__item"
+                    type="button"
+                    data-view="settings"
+                >
+                    <span aria-hidden="true">⚙</span>
+                    <span>Settings</span>
+                </button>
+            </nav>
+
+            <section class="sidebar-card">
+                <p class="sidebar-card__label">Storage</p>
+
+                <p class="sidebar-card__status">
+                    <span class="status-dot" aria-hidden="true"></span>
+                    Saved on this device
+                </p>
+
+                <p class="sidebar-card__description">
+                    Your custom links, tasks, and settings are saved in this
+                    browser. They do not automatically sync between devices.
+                </p>
+            </section>
+        </aside>
+
+        <button
+            id="sidebar-overlay"
+            class="sidebar-overlay"
+            type="button"
+            aria-label="Close navigation"
+            hidden
+        ></button>
+
+        <main id="main-content" class="main-content" tabindex="-1">
+            <label class="mobile-search" for="mobile-search">
+                <span class="visually-hidden">Search links</span>
+
+                <span class="search-icon" aria-hidden="true">⌕</span>
+
+                <input
+                    id="mobile-search"
+                    class="search-input"
+                    type="search"
+                    placeholder="Search your links..."
+                    autocomplete="off"
+                >
+            </label>
+
+            <!-- Home View -->
+
+            <section
+                id="home-view"
+                class="view view--active"
+                data-view-panel="home"
+            >
+                <section class="hero">
+                    <div class="hero__content">
+                        <p class="hero__eyebrow">
+                            <span aria-hidden="true">✨</span>
+                            Student command center
+                        </p>
+
+                        <h1>Welcome to Rocket Launchpad</h1>
+
+                        <p class="hero__description">
+                            Keep your University of Toledo links, assignments,
+                            and student tools together in one customizable
+                            dashboard.
+                        </p>
+
+                        <div class="hero__actions">
+                            <button
+                                id="hero-add-link-button"
+                                class="hero-button hero-button--primary"
+                                type="button"
+                            >
+                                Add your first link
+                            </button>
+
+                            <button
+                                class="hero-button hero-button--secondary"
+                                type="button"
+                                data-open-view="tasks"
+                            >
+                                View tasks
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="hero__semester-card">
+                        <span>Fall Semester 2026</span>
+                        <strong>Stay organized</strong>
+                        <small>Links and tasks are saved automatically.</small>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="section-heading__eyebrow">Launchpad</p>
+                            <h2>Quick access</h2>
+                        </div>
+
+                        <button
+                            class="text-button"
+                            type="button"
+                            data-open-view="links"
+                        >
+                            View all
+                            <span aria-hidden="true">→</span>
+                        </button>
+                    </div>
+
+                    <div
+                        id="quick-links-grid"
+                        class="link-grid"
+                        aria-live="polite"
+                    ></div>
+
+                    <div id="quick-links-empty" class="empty-state" hidden>
+                        <span class="empty-state__icon" aria-hidden="true">🔗</span>
+                        <h3>No links found</h3>
+                        <p>
+                            Try another search or add a custom shortcut.
+                        </p>
+
+                        <button
+                            class="primary-button"
+                            type="button"
+                            data-add-link
+                        >
+                            Add a link
+                        </button>
+                    </div>
+                </section>
+
+                <section class="dashboard-grid">
+                    <article class="panel">
+                        <div class="panel__heading">
+                            <div>
+                                <p class="section-heading__eyebrow">Planning</p>
+                                <h2>Priority tasks</h2>
+                            </div>
+
+                            <button
+                                class="icon-button"
+                                type="button"
+                                data-open-view="tasks"
+                                aria-label="Open all tasks"
+                                title="Open all tasks"
+                            >
+                                <span aria-hidden="true">→</span>
+                            </button>
+                        </div>
+
+                        <div
+                            id="home-tasks-list"
+                            class="task-list"
+                            aria-live="polite"
+                        ></div>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel__heading">
+                            <div>
+                                <p class="section-heading__eyebrow">Today</p>
+                                <h2>Student reminders</h2>
+                            </div>
+
+                            <span class="panel__icon" aria-hidden="true">📅</span>
+                        </div>
+
+                        <div class="reminder-list">
+                            <div class="reminder">
+                                <span
+                                    class="reminder__accent reminder__accent--blue"
+                                    aria-hidden="true"
+                                ></span>
+
+                                <div>
+                                    <strong>Check Blackboard</strong>
+                                    <p>
+                                        Review announcements and upcoming
+                                        assignments.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="reminder">
+                                <span
+                                    class="reminder__accent reminder__accent--gold"
+                                    aria-hidden="true"
+                                ></span>
+
+                                <div>
+                                    <strong>Review Rocket Email</strong>
+                                    <p>
+                                        Watch for class updates and university
+                                        notices.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                </section>
+            </section>
+
+            <!-- Links View -->
+
+            <section
+                id="links-view"
+                class="view"
+                data-view-panel="links"
+                hidden
+            >
+                <div class="page-heading">
+                    <div>
+                        <p class="section-heading__eyebrow">Customize</p>
+                        <h1>All links</h1>
+                        <p>
+                            Add, search, open, and remove shortcuts from your
+                            personal launchpad.
+                        </p>
+                    </div>
+
+                    <button
+                        class="primary-button"
+                        type="button"
+                        data-add-link
+                    >
+                        <span aria-hidden="true">＋</span>
+                        Add link
+                    </button>
+                </div>
+
+                <div
+                    id="all-links-grid"
+                    class="link-grid link-grid--large"
+                    aria-live="polite"
+                ></div>
+
+                <div id="all-links-empty" class="empty-state" hidden>
+                    <span class="empty-state__icon" aria-hidden="true">🔍</span>
+                    <h2>No matching links</h2>
+                    <p>
+                        Clear your search or add a new shortcut.
+                    </p>
+
+                    <button
+                        id="clear-search-button"
+                        class="secondary-button"
+                        type="button"
+                    >
+                        Clear search
+                    </button>
+                </div>
+            </section>
+
+            <!-- Tasks View -->
+
+            <section
+                id="tasks-view"
+                class="view"
+                data-view-panel="tasks"
+                hidden
+            >
+                <div class="page-heading">
+                    <div>
+                        <p class="section-heading__eyebrow">Stay organized</p>
+                        <h1>Tasks</h1>
+                        <p>
+                            Track assignments, reminders, and other priorities.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="tasks-layout">
+                    <article class="panel">
+                        <div class="panel__heading">
+                            <div>
+                                <p class="section-heading__eyebrow">New item</p>
+                                <h2>Add a task</h2>
+                            </div>
+                        </div>
+
+                        <form id="task-form" class="form-stack">
+                            <div class="form-field">
+                                <label for="task-title">Task name</label>
+
+                                <input
+                                    id="task-title"
+                                    name="taskTitle"
+                                    type="text"
+                                    maxlength="120"
+                                    placeholder="Finish weekly assignment"
+                                    required
+                                >
+                            </div>
+
+                            <div class="form-field">
+                                <label for="task-due-date">Due date</label>
+
+                                <input
+                                    id="task-due-date"
+                                    name="taskDueDate"
+                                    type="date"
+                                >
+                            </div>
+
+                            <button class="primary-button" type="submit">
+                                Add task
+                            </button>
+                        </form>
+                    </article>
+
+                    <article class="panel">
+                        <div class="panel__heading">
+                            <div>
+                                <p class="section-heading__eyebrow">Checklist</p>
+                                <h2>Your tasks</h2>
+                            </div>
+
+                            <span
+                                id="task-count"
+                                class="count-badge"
+                                aria-live="polite"
+                            >
+                                0 remaining
+                            </span>
+                        </div>
+
+                        <div
+                            id="all-tasks-list"
+                            class="task-list"
+                            aria-live="polite"
+                        ></div>
+
+                        <div id="tasks-empty" class="empty-state" hidden>
+                            <span class="empty-state__icon" aria-hidden="true">✓</span>
+                            <h3>No tasks yet</h3>
+                            <p>
+                                Add an assignment or reminder using the form.
+                            </p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+
+            <!-- Settings View -->
+
+            <section
+                id="settings-view"
+                class="view"
+                data-view-panel="settings"
+                hidden
+            >
+                <div class="page-heading">
+                    <div>
+                        <p class="section-heading__eyebrow">Personalize</p>
+                        <h1>Settings</h1>
+                        <p>
+                            Manage your dashboard data and appearance.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="settings-grid">
+                    <article class="settings-card">
+                        <span
+                            class="settings-card__icon"
+                            aria-hidden="true"
+                        >
+                            ☀️
+                        </span>
+
+                        <div class="settings-card__content">
+                            <h2>Appearance</h2>
+                            <p>
+                                Switch between light and dark mode.
+                            </p>
+                        </div>
+
+                        <button
+                            id="settings-theme-button"
+                            class="secondary-button"
+                            type="button"
+                        >
+                            Change theme
+                        </button>
+                    </article>
+
+                    <article class="settings-card">
+                        <span
+                            class="settings-card__icon"
+                            aria-hidden="true"
+                        >
+                            ⇩
+                        </span>
+
+                        <div class="settings-card__content">
+                            <h2>Export dashboard</h2>
+                            <p>
+                                Download your links, tasks, and settings as a
+                                JSON backup.
+                            </p>
+                        </div>
+
+                        <button
+                            id="export-data-button"
+                            class="secondary-button"
+                            type="button"
+                        >
+                            Export data
+                        </button>
+                    </article>
+
+                    <article class="settings-card">
+                        <span
+                            class="settings-card__icon"
+                            aria-hidden="true"
+                        >
+                            ⇧
+                        </span>
+
+                        <div class="settings-card__content">
+                            <h2>Import dashboard</h2>
+                            <p>
+                                Restore a Rocket Launchpad backup on this
+                                browser.
+                            </p>
+                        </div>
+
+                        <input
+                            id="import-data-input"
+                            class="visually-hidden"
+                            type="file"
+                            accept="application/json,.json"
+                        >
+
+                        <button
+                            id="import-data-button"
+                            class="secondary-button"
+                            type="button"
+                        >
+                            Choose backup
+                        </button>
+                    </article>
+
+                    <article class="settings-card settings-card--danger">
+                        <span
+                            class="settings-card__icon"
+                            aria-hidden="true"
+                        >
+                            🗑
+                        </span>
+
+                        <div class="settings-card__content">
+                            <h2>Reset dashboard</h2>
+                            <p>
+                                Delete local changes and restore the default
+                                links and tasks.
+                            </p>
+                        </div>
+
+                        <button
+                            id="reset-data-button"
+                            class="danger-button"
+                            type="button"
+                        >
+                            Reset data
+                        </button>
+                    </article>
+                </div>
+            </section>
+
+            <footer class="site-footer">
+                <p>
+                    Rocket Launchpad is an unofficial personal student project.
+                    It is not created, operated, sponsored, or endorsed by The
+                    University of Toledo.
+                </p>
+
+                <p>
+                    University login information is never requested or stored.
+                </p>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Add Link Dialog -->
+
+    <dialog id="link-dialog" class="dialog">
+        <form id="link-form" class="dialog__content">
+            <div class="dialog__heading">
+                <div>
+                    <p class="section-heading__eyebrow">Customize</p>
+                    <h2>Add a link</h2>
+                </div>
+
+                <button
+                    id="close-link-dialog-button"
+                    class="icon-button"
+                    type="button"
+                    aria-label="Close dialog"
+                >
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+
+            <div class="form-stack">
+                <div class="form-field">
+                    <label for="link-name">Link name</label>
+
+                    <input
+                        id="link-name"
+                        name="linkName"
+                        type="text"
+                        maxlength="60"
+                        placeholder="University Library"
+                        required
+                    >
+                </div>
+
+                <div class="form-field">
+                    <label for="link-url">Website address</label>
+
+                    <input
+                        id="link-url"
+                        name="linkUrl"
+                        type="text"
+                        inputmode="url"
+                        maxlength="500"
+                        placeholder="https://www.example.com"
+                        required
+                    >
+
+                    <small>
+                        Only HTTP and HTTPS website addresses are accepted.
+                    </small>
+                </div>
+
+                <div class="form-field">
+                    <label for="link-category">Category</label>
+
+                    <select
+                        id="link-category"
+                        name="linkCategory"
+                    >
+                        <option value="University">University</option>
+                        <option value="Classes">Classes</option>
+                        <option value="Communication">Communication</option>
+                        <option value="Planning">Planning</option>
+                        <option value="Personal">Personal</option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="link-icon">Icon</label>
+
+                    <select id="link-icon" name="linkIcon">
+                        <option value="🔗">🔗 Link</option>
+                        <option value="🎓">🎓 University</option>
+                        <option value="📚">📚 Classes</option>
+                        <option value="✉️">✉️ Email</option>
+                        <option value="📅">📅 Calendar</option>
+                        <option value="✅">✅ Planning</option>
+                        <option value="💳">💳 Financial</option>
+                        <option value="📍">📍 Location</option>
+                        <option value="💻">💻 Technology</option>
+                    </select>
+                </div>
+            </div>
+
+            <p id="link-form-error" class="form-error" role="alert" hidden></p>
+
+            <div class="dialog__actions">
+                <button
+                    id="cancel-link-button"
+                    class="secondary-button"
+                    type="button"
+                >
+                    Cancel
+                </button>
+
+                <button class="primary-button" type="submit">
+                    Save link
+                </button>
+            </div>
+        </form>
+    </dialog>
+
+    <div
+        id="toast"
+        class="toast"
+        role="status"
+        aria-live="polite"
+        hidden
+    ></div>
+
+    <script src="js/storage.js"></script>
+    <script src="js/links.js"></script>
+    <script src="js/tasks.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
