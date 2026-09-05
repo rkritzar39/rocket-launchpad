@@ -21,11 +21,11 @@
 </head>
 
 <body>
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
 
     <div class="app-shell">
         <header class="topbar">
-            <div class="topbar__brand">
+            <div class="topbar__left">
                 <button
                     id="menu-button"
                     class="icon-button mobile-menu-button"
@@ -37,31 +37,35 @@
                     <span aria-hidden="true">☰</span>
                 </button>
 
-                <a href="#" class="brand-link">
+                <button
+                    class="brand"
+                    type="button"
+                    data-open-view="home"
+                    aria-label="Open Rocket Launchpad home"
+                >
                     <span class="brand__icon" aria-hidden="true">🚀</span>
 
                     <span class="brand__text">
                         <strong>Rocket Launchpad</strong>
                         <small>Unofficial student dashboard</small>
                     </span>
-                </a>
+                </button>
             </div>
 
-            <div class="topbar__actions">
-                <label class="desktop-search" for="desktop-search">
-                    <span class="visually-hidden">Search links</span>
-
-                    <span class="search-icon" aria-hidden="true">⌕</span>
+            <div class="topbar__center">
+                <label class="search-box" for="desktop-search">
+                    <span class="search-box__icon" aria-hidden="true">⌕</span>
 
                     <input
                         id="desktop-search"
-                        class="search-input"
                         type="search"
-                        placeholder="Search your links..."
+                        placeholder="Search applications..."
                         autocomplete="off"
                     >
                 </label>
+            </div>
 
+            <div class="topbar__actions">
                 <button
                     id="theme-button"
                     class="icon-button"
@@ -74,65 +78,81 @@
 
                 <button
                     id="add-link-button"
-                    class="primary-button"
+                    class="primary-button topbar__add-button"
                     type="button"
                 >
                     <span aria-hidden="true">＋</span>
-                    <span>Add link</span>
+                    <span class="button-label">Add app</span>
                 </button>
             </div>
         </header>
 
-        <aside id="sidebar" class="sidebar" aria-label="Primary navigation">
-            <nav class="navigation">
+        <aside id="sidebar" class="sidebar">
+            <nav class="sidebar__navigation" aria-label="Primary navigation">
                 <button
-                    class="navigation__item navigation__item--active"
+                    class="navigation-item navigation-item--active"
                     type="button"
                     data-view="home"
+                    aria-current="page"
                 >
-                    <span aria-hidden="true">⌂</span>
+                    <span class="navigation-item__icon" aria-hidden="true">⌂</span>
                     <span>Home</span>
                 </button>
 
                 <button
-                    class="navigation__item"
+                    class="navigation-item"
                     type="button"
-                    data-view="links"
+                    data-view="applications"
                 >
-                    <span aria-hidden="true">🔗</span>
-                    <span>All links</span>
+                    <span class="navigation-item__icon" aria-hidden="true">▦</span>
+                    <span>Applications</span>
                 </button>
 
                 <button
-                    class="navigation__item"
+                    class="navigation-item"
                     type="button"
                     data-view="tasks"
                 >
-                    <span aria-hidden="true">✓</span>
+                    <span class="navigation-item__icon" aria-hidden="true">✓</span>
                     <span>Tasks</span>
+
+                    <span
+                        id="sidebar-task-count"
+                        class="navigation-item__badge"
+                        hidden
+                    >
+                        0
+                    </span>
                 </button>
 
                 <button
-                    class="navigation__item"
+                    class="navigation-item"
+                    type="button"
+                    data-view="classes"
+                >
+                    <span class="navigation-item__icon" aria-hidden="true">▤</span>
+                    <span>Classes</span>
+                </button>
+
+                <button
+                    class="navigation-item"
                     type="button"
                     data-view="settings"
                 >
-                    <span aria-hidden="true">⚙</span>
+                    <span class="navigation-item__icon" aria-hidden="true">⚙</span>
                     <span>Settings</span>
                 </button>
             </nav>
 
-            <section class="sidebar-card">
-                <p class="sidebar-card__label">Storage</p>
+            <section class="storage-card">
+                <div class="storage-card__header">
+                    <span class="storage-card__dot" aria-hidden="true"></span>
+                    <strong>Saved locally</strong>
+                </div>
 
-                <p class="sidebar-card__status">
-                    <span class="status-dot" aria-hidden="true"></span>
-                    Saved on this device
-                </p>
-
-                <p class="sidebar-card__description">
-                    Your custom links, tasks, and settings are saved in this
-                    browser. They do not automatically sync between devices.
+                <p>
+                    Your changes are stored in this browser. Firebase
+                    synchronization will be added later.
                 </p>
             </section>
         </aside>
@@ -146,21 +166,20 @@
         ></button>
 
         <main id="main-content" class="main-content" tabindex="-1">
-            <label class="mobile-search" for="mobile-search">
-                <span class="visually-hidden">Search links</span>
-
-                <span class="search-icon" aria-hidden="true">⌕</span>
+            <label class="mobile-search" for="mobile-search-input">
+                <span class="search-box__icon" aria-hidden="true">⌕</span>
 
                 <input
-                    id="mobile-search"
-                    class="search-input"
+                    id="mobile-search-input"
                     type="search"
-                    placeholder="Search your links..."
+                    placeholder="Search applications..."
                     autocomplete="off"
                 >
             </label>
 
-            <!-- Home View -->
+            <!-- ========================================================== -->
+            <!-- Home View                                                  -->
+            <!-- ========================================================== -->
 
             <section
                 id="home-view"
@@ -171,24 +190,28 @@
                     <div class="hero__content">
                         <p class="hero__eyebrow">
                             <span aria-hidden="true">✨</span>
-                            Student command center
+                            Your college command center
                         </p>
 
-                        <h1>Welcome to Rocket Launchpad</h1>
+                        <h1>
+                            Everything you need,
+                            <span>one launch away.</span>
+                        </h1>
 
                         <p class="hero__description">
-                            Keep your University of Toledo links, assignments,
-                            and student tools together in one customizable
-                            dashboard.
+                            Keep your university resources, assignments,
+                            classes, and personal tools organized in one
+                            customizable dashboard.
                         </p>
 
                         <div class="hero__actions">
                             <button
-                                id="hero-add-link-button"
                                 class="hero-button hero-button--primary"
                                 type="button"
+                                data-add-link
                             >
-                                Add your first link
+                                <span aria-hidden="true">＋</span>
+                                Add an application
                             </button>
 
                             <button
@@ -201,24 +224,27 @@
                         </div>
                     </div>
 
-                    <div class="hero__semester-card">
-                        <span>Fall Semester 2026</span>
+                    <div class="hero__status">
+                        <span class="hero__status-label">Fall 2026</span>
                         <strong>Stay organized</strong>
-                        <small>Links and tasks are saved automatically.</small>
+                        <p>
+                            Your links, classes, tasks, and preferences save
+                            automatically in this browser.
+                        </p>
                     </div>
                 </section>
 
                 <section class="content-section">
                     <div class="section-heading">
                         <div>
-                            <p class="section-heading__eyebrow">Launchpad</p>
-                            <h2>Quick access</h2>
+                            <p class="eyebrow">Your essentials</p>
+                            <h2>Favorite applications</h2>
                         </div>
 
                         <button
                             class="text-button"
                             type="button"
-                            data-open-view="links"
+                            data-open-view="applications"
                         >
                             View all
                             <span aria-hidden="true">→</span>
@@ -226,25 +252,56 @@
                     </div>
 
                     <div
-                        id="quick-links-grid"
-                        class="link-grid"
+                        id="favorite-apps-grid"
+                        class="application-grid"
                         aria-live="polite"
                     ></div>
 
-                    <div id="quick-links-empty" class="empty-state" hidden>
-                        <span class="empty-state__icon" aria-hidden="true">🔗</span>
-                        <h3>No links found</h3>
+                    <div
+                        id="favorite-apps-empty"
+                        class="empty-state"
+                        hidden
+                    >
+                        <span class="empty-state__icon" aria-hidden="true">☆</span>
+                        <h3>No favorite applications</h3>
                         <p>
-                            Try another search or add a custom shortcut.
+                            Select the star on an application to add it here.
                         </p>
 
                         <button
-                            class="primary-button"
+                            class="secondary-button"
                             type="button"
-                            data-add-link
+                            data-open-view="applications"
                         >
-                            Add a link
+                            Browse applications
                         </button>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="eyebrow">Continue where you left off</p>
+                            <h2>Recently opened</h2>
+                        </div>
+                    </div>
+
+                    <div
+                        id="recent-apps-grid"
+                        class="application-grid application-grid--compact"
+                        aria-live="polite"
+                    ></div>
+
+                    <div
+                        id="recent-apps-empty"
+                        class="empty-state empty-state--small"
+                        hidden
+                    >
+                        <span class="empty-state__icon" aria-hidden="true">↗</span>
+                        <h3>No recent applications</h3>
+                        <p>
+                            Applications you open will appear here.
+                        </p>
                     </div>
                 </section>
 
@@ -252,7 +309,7 @@
                     <article class="panel">
                         <div class="panel__heading">
                             <div>
-                                <p class="section-heading__eyebrow">Planning</p>
+                                <p class="eyebrow">Today</p>
                                 <h2>Priority tasks</h2>
                             </div>
 
@@ -272,68 +329,72 @@
                             class="task-list"
                             aria-live="polite"
                         ></div>
+
+                        <div
+                            id="home-tasks-empty"
+                            class="empty-state empty-state--small"
+                            hidden
+                        >
+                            <span class="empty-state__icon" aria-hidden="true">✓</span>
+                            <h3>You are caught up</h3>
+                            <p>No incomplete tasks are waiting.</p>
+                        </div>
                     </article>
 
                     <article class="panel">
                         <div class="panel__heading">
                             <div>
-                                <p class="section-heading__eyebrow">Today</p>
-                                <h2>Student reminders</h2>
+                                <p class="eyebrow">Schedule</p>
+                                <h2>Classes</h2>
                             </div>
 
-                            <span class="panel__icon" aria-hidden="true">📅</span>
+                            <button
+                                class="icon-button"
+                                type="button"
+                                data-open-view="classes"
+                                aria-label="Open classes"
+                                title="Open classes"
+                            >
+                                <span aria-hidden="true">→</span>
+                            </button>
                         </div>
 
-                        <div class="reminder-list">
-                            <div class="reminder">
-                                <span
-                                    class="reminder__accent reminder__accent--blue"
-                                    aria-hidden="true"
-                                ></span>
-
-                                <div>
-                                    <strong>Check Blackboard</strong>
-                                    <p>
-                                        Review announcements and upcoming
-                                        assignments.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="reminder">
-                                <span
-                                    class="reminder__accent reminder__accent--gold"
-                                    aria-hidden="true"
-                                ></span>
-
-                                <div>
-                                    <strong>Review Rocket Email</strong>
-                                    <p>
-                                        Watch for class updates and university
-                                        notices.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                        <div id="home-classes-list" class="mini-class-list"></div>
                     </article>
+                </section>
+
+                <section class="notice-card">
+                    <span class="notice-card__icon" aria-hidden="true">ℹ</span>
+
+                    <div>
+                        <strong>Unofficial student project</strong>
+
+                        <p>
+                            Rocket Launchpad is a personal organization tool.
+                            It does not replace myUT, Blackboard, or another
+                            official University of Toledo service.
+                        </p>
+                    </div>
                 </section>
             </section>
 
-            <!-- Links View -->
+            <!-- ========================================================== -->
+            <!-- Applications View                                          -->
+            <!-- ========================================================== -->
 
             <section
-                id="links-view"
+                id="applications-view"
                 class="view"
-                data-view-panel="links"
+                data-view-panel="applications"
                 hidden
             >
                 <div class="page-heading">
                     <div>
-                        <p class="section-heading__eyebrow">Customize</p>
-                        <h1>All links</h1>
+                        <p class="eyebrow">Your launchpad</p>
+                        <h1>Applications</h1>
                         <p>
-                            Add, search, open, and remove shortcuts from your
-                            personal launchpad.
+                            Open, organize, favorite, and customize your
+                            college resources.
                         </p>
                     </div>
 
@@ -343,34 +404,102 @@
                         data-add-link
                     >
                         <span aria-hidden="true">＋</span>
-                        Add link
+                        Add application
+                    </button>
+                </div>
+
+                <section class="application-toolbar">
+                    <label
+                        class="toolbar-search"
+                        for="applications-search"
+                    >
+                        <span class="search-box__icon" aria-hidden="true">⌕</span>
+
+                        <input
+                            id="applications-search"
+                            type="search"
+                            placeholder="Search by name or category..."
+                            autocomplete="off"
+                        >
+                    </label>
+
+                    <label class="select-control" for="category-filter">
+                        <span class="visually-hidden">Filter by category</span>
+
+                        <select id="category-filter">
+                            <option value="all">All categories</option>
+                            <option value="favorites">Favorites</option>
+                        </select>
+                    </label>
+
+                    <div
+                        class="view-toggle"
+                        role="group"
+                        aria-label="Application display"
+                    >
+                        <button
+                            id="grid-view-button"
+                            class="view-toggle__button view-toggle__button--active"
+                            type="button"
+                            aria-label="Grid view"
+                            title="Grid view"
+                        >
+                            <span aria-hidden="true">▦</span>
+                        </button>
+
+                        <button
+                            id="list-view-button"
+                            class="view-toggle__button"
+                            type="button"
+                            aria-label="List view"
+                            title="List view"
+                        >
+                            <span aria-hidden="true">☷</span>
+                        </button>
+                    </div>
+                </section>
+
+                <div class="application-summary">
+                    <span id="applications-result-count">
+                        0 applications
+                    </span>
+
+                    <button
+                        id="clear-app-filters-button"
+                        class="text-button"
+                        type="button"
+                    >
+                        Clear filters
                     </button>
                 </div>
 
                 <div
-                    id="all-links-grid"
-                    class="link-grid link-grid--large"
+                    id="all-apps-grid"
+                    class="application-grid"
                     aria-live="polite"
                 ></div>
 
-                <div id="all-links-empty" class="empty-state" hidden>
-                    <span class="empty-state__icon" aria-hidden="true">🔍</span>
-                    <h2>No matching links</h2>
+                <div id="all-apps-empty" class="empty-state" hidden>
+                    <span class="empty-state__icon" aria-hidden="true">⌕</span>
+                    <h2>No matching applications</h2>
                     <p>
-                        Clear your search or add a new shortcut.
+                        Try another search, clear your category filter, or add
+                        a custom application.
                     </p>
 
                     <button
-                        id="clear-search-button"
-                        class="secondary-button"
+                        class="primary-button"
                         type="button"
+                        data-add-link
                     >
-                        Clear search
+                        Add application
                     </button>
                 </div>
             </section>
 
-            <!-- Tasks View -->
+            <!-- ========================================================== -->
+            <!-- Tasks View                                                 -->
+            <!-- ========================================================== -->
 
             <section
                 id="tasks-view"
@@ -380,19 +509,24 @@
             >
                 <div class="page-heading">
                     <div>
-                        <p class="section-heading__eyebrow">Stay organized</p>
+                        <p class="eyebrow">Stay organized</p>
                         <h1>Tasks</h1>
                         <p>
-                            Track assignments, reminders, and other priorities.
+                            Track assignments, reminders, deadlines, and
+                            personal priorities.
                         </p>
                     </div>
+
+                    <span id="task-summary-badge" class="summary-badge">
+                        0 remaining
+                    </span>
                 </div>
 
                 <div class="tasks-layout">
-                    <article class="panel">
+                    <article class="panel task-form-panel">
                         <div class="panel__heading">
                             <div>
-                                <p class="section-heading__eyebrow">New item</p>
+                                <p class="eyebrow">New item</p>
                                 <h2>Add a task</h2>
                             </div>
                         </div>
@@ -403,11 +537,21 @@
 
                                 <input
                                     id="task-title"
-                                    name="taskTitle"
                                     type="text"
                                     maxlength="120"
-                                    placeholder="Finish weekly assignment"
+                                    placeholder="Complete weekly assignment"
                                     required
+                                >
+                            </div>
+
+                            <div class="form-field">
+                                <label for="task-subject">Class or subject</label>
+
+                                <input
+                                    id="task-subject"
+                                    type="text"
+                                    maxlength="60"
+                                    placeholder="Optional"
                                 >
                             </div>
 
@@ -416,31 +560,49 @@
 
                                 <input
                                     id="task-due-date"
-                                    name="taskDueDate"
                                     type="date"
                                 >
                             </div>
 
+                            <div class="form-field">
+                                <label for="task-priority">Priority</label>
+
+                                <select id="task-priority">
+                                    <option value="normal">Normal</option>
+                                    <option value="high">High</option>
+                                    <option value="low">Low</option>
+                                </select>
+                            </div>
+
                             <button class="primary-button" type="submit">
+                                <span aria-hidden="true">＋</span>
                                 Add task
                             </button>
                         </form>
                     </article>
 
                     <article class="panel">
-                        <div class="panel__heading">
+                        <div class="panel__heading task-list-heading">
                             <div>
-                                <p class="section-heading__eyebrow">Checklist</p>
+                                <p class="eyebrow">Checklist</p>
                                 <h2>Your tasks</h2>
                             </div>
 
-                            <span
-                                id="task-count"
-                                class="count-badge"
-                                aria-live="polite"
+                            <label
+                                class="select-control"
+                                for="task-filter"
                             >
-                                0 remaining
-                            </span>
+                                <span class="visually-hidden">
+                                    Filter tasks
+                                </span>
+
+                                <select id="task-filter">
+                                    <option value="all">All tasks</option>
+                                    <option value="active">Incomplete</option>
+                                    <option value="completed">Completed</option>
+                                    <option value="overdue">Overdue</option>
+                                </select>
+                            </label>
                         </div>
 
                         <div
@@ -449,18 +611,93 @@
                             aria-live="polite"
                         ></div>
 
-                        <div id="tasks-empty" class="empty-state" hidden>
+                        <div id="all-tasks-empty" class="empty-state" hidden>
                             <span class="empty-state__icon" aria-hidden="true">✓</span>
-                            <h3>No tasks yet</h3>
+                            <h3>No matching tasks</h3>
                             <p>
-                                Add an assignment or reminder using the form.
+                                Add a task or change the selected filter.
                             </p>
                         </div>
                     </article>
                 </div>
             </section>
 
-            <!-- Settings View -->
+            <!-- ========================================================== -->
+            <!-- Classes View                                               -->
+            <!-- ========================================================== -->
+
+            <section
+                id="classes-view"
+                class="view"
+                data-view-panel="classes"
+                hidden
+            >
+                <div class="page-heading">
+                    <div>
+                        <p class="eyebrow">Fall 2026</p>
+                        <h1>Classes</h1>
+                        <p>
+                            Keep your schedule, class links, locations, and
+                            instructor information together.
+                        </p>
+                    </div>
+                </div>
+
+                <section class="class-overview-grid">
+                    <article class="stat-card">
+                        <span class="stat-card__icon" aria-hidden="true">▤</span>
+                        <div>
+                            <strong id="class-count-stat">0</strong>
+                            <span>Classes</span>
+                        </div>
+                    </article>
+
+                    <article class="stat-card">
+                        <span class="stat-card__icon" aria-hidden="true">◷</span>
+                        <div>
+                            <strong id="weekly-meeting-stat">0</strong>
+                            <span>Weekly meetings</span>
+                        </div>
+                    </article>
+
+                    <article class="stat-card">
+                        <span class="stat-card__icon" aria-hidden="true">📍</span>
+                        <div>
+                            <strong id="campus-class-stat">0</strong>
+                            <span>On-campus classes</span>
+                        </div>
+                    </article>
+                </section>
+
+                <section class="content-section">
+                    <div class="section-heading">
+                        <div>
+                            <p class="eyebrow">Weekly schedule</p>
+                            <h2>Your courses</h2>
+                        </div>
+                    </div>
+
+                    <div id="classes-grid" class="classes-grid"></div>
+                </section>
+
+                <article class="notice-card">
+                    <span class="notice-card__icon" aria-hidden="true">✎</span>
+
+                    <div>
+                        <strong>Sample class information</strong>
+
+                        <p>
+                            The current classes are interface examples. A
+                            future update will let you add, edit, and remove
+                            your own courses.
+                        </p>
+                    </div>
+                </article>
+            </section>
+
+            <!-- ========================================================== -->
+            <!-- Settings View                                              -->
+            <!-- ========================================================== -->
 
             <section
                 id="settings-view"
@@ -470,27 +707,26 @@
             >
                 <div class="page-heading">
                     <div>
-                        <p class="section-heading__eyebrow">Personalize</p>
+                        <p class="eyebrow">Personalize</p>
                         <h1>Settings</h1>
                         <p>
-                            Manage your dashboard data and appearance.
+                            Control appearance, application display, and local
+                            dashboard data.
                         </p>
                     </div>
                 </div>
 
-                <div class="settings-grid">
+                <div class="settings-list">
                     <article class="settings-card">
-                        <span
-                            class="settings-card__icon"
-                            aria-hidden="true"
-                        >
-                            ☀️
+                        <span class="settings-card__icon" aria-hidden="true">
+                            ◐
                         </span>
 
                         <div class="settings-card__content">
                             <h2>Appearance</h2>
                             <p>
-                                Switch between light and dark mode.
+                                Switch Rocket Launchpad between light and dark
+                                mode.
                             </p>
                         </div>
 
@@ -504,18 +740,43 @@
                     </article>
 
                     <article class="settings-card">
-                        <span
-                            class="settings-card__icon"
-                            aria-hidden="true"
+                        <span class="settings-card__icon" aria-hidden="true">
+                            ▦
+                        </span>
+
+                        <div class="settings-card__content">
+                            <h2>Default application view</h2>
+                            <p>
+                                Choose whether applications appear in a grid
+                                or list.
+                            </p>
+                        </div>
+
+                        <label
+                            class="select-control"
+                            for="default-layout-select"
                         >
+                            <span class="visually-hidden">
+                                Default application layout
+                            </span>
+
+                            <select id="default-layout-select">
+                                <option value="grid">Grid</option>
+                                <option value="list">List</option>
+                            </select>
+                        </label>
+                    </article>
+
+                    <article class="settings-card">
+                        <span class="settings-card__icon" aria-hidden="true">
                             ⇩
                         </span>
 
                         <div class="settings-card__content">
                             <h2>Export dashboard</h2>
                             <p>
-                                Download your links, tasks, and settings as a
-                                JSON backup.
+                                Download your applications, tasks, and settings
+                                as a JSON backup.
                             </p>
                         </div>
 
@@ -529,18 +790,15 @@
                     </article>
 
                     <article class="settings-card">
-                        <span
-                            class="settings-card__icon"
-                            aria-hidden="true"
-                        >
+                        <span class="settings-card__icon" aria-hidden="true">
                             ⇧
                         </span>
 
                         <div class="settings-card__content">
                             <h2>Import dashboard</h2>
                             <p>
-                                Restore a Rocket Launchpad backup on this
-                                browser.
+                                Restore a previously exported Rocket Launchpad
+                                backup.
                             </p>
                         </div>
 
@@ -548,7 +806,7 @@
                             id="import-data-input"
                             class="visually-hidden"
                             type="file"
-                            accept="application/json,.json"
+                            accept=".json,application/json"
                         >
 
                         <button
@@ -561,18 +819,15 @@
                     </article>
 
                     <article class="settings-card settings-card--danger">
-                        <span
-                            class="settings-card__icon"
-                            aria-hidden="true"
-                        >
+                        <span class="settings-card__icon" aria-hidden="true">
                             🗑
                         </span>
 
                         <div class="settings-card__content">
                             <h2>Reset dashboard</h2>
                             <p>
-                                Delete local changes and restore the default
-                                links and tasks.
+                                Remove your changes and restore the default
+                                applications, tasks, and settings.
                             </p>
                         </div>
 
@@ -585,6 +840,32 @@
                         </button>
                     </article>
                 </div>
+
+                <article class="privacy-card">
+                    <h2>Privacy and storage</h2>
+
+                    <ul>
+                        <li>
+                            Data is currently stored only in this browser.
+                        </li>
+
+                        <li>
+                            University passwords and account credentials are
+                            never requested or stored.
+                        </li>
+
+                        <li>
+                            Do not store grades, student identification
+                            numbers, financial information, or other sensitive
+                            information.
+                        </li>
+
+                        <li>
+                            Firebase account synchronization will be added in a
+                            later development phase.
+                        </li>
+                    </ul>
+                </article>
             </section>
 
             <footer class="site-footer">
@@ -595,27 +876,33 @@
                 </p>
 
                 <p>
-                    University login information is never requested or stored.
+                    University credentials are never requested or stored.
                 </p>
             </footer>
         </main>
     </div>
 
-    <!-- Add Link Dialog -->
+    <!-- ================================================================ -->
+    <!-- Application Dialog                                               -->
+    <!-- ================================================================ -->
 
-    <dialog id="link-dialog" class="dialog">
-        <form id="link-form" class="dialog__content">
+    <dialog id="application-dialog" class="dialog">
+        <form id="application-form" class="dialog__content">
+            <input id="application-id" type="hidden">
+
             <div class="dialog__heading">
                 <div>
-                    <p class="section-heading__eyebrow">Customize</p>
-                    <h2>Add a link</h2>
+                    <p class="eyebrow">Customize</p>
+                    <h2 id="application-dialog-title">
+                        Add application
+                    </h2>
                 </div>
 
                 <button
-                    id="close-link-dialog-button"
+                    id="close-application-dialog-button"
                     class="icon-button"
                     type="button"
-                    aria-label="Close dialog"
+                    aria-label="Close application dialog"
                 >
                     <span aria-hidden="true">×</span>
                 </button>
@@ -623,24 +910,22 @@
 
             <div class="form-stack">
                 <div class="form-field">
-                    <label for="link-name">Link name</label>
+                    <label for="application-name">Application name</label>
 
                     <input
-                        id="link-name"
-                        name="linkName"
+                        id="application-name"
                         type="text"
                         maxlength="60"
-                        placeholder="University Library"
+                        placeholder="University Libraries"
                         required
                     >
                 </div>
 
                 <div class="form-field">
-                    <label for="link-url">Website address</label>
+                    <label for="application-url">Website address</label>
 
                     <input
-                        id="link-url"
-                        name="linkUrl"
+                        id="application-url"
                         type="text"
                         inputmode="url"
                         maxlength="500"
@@ -649,47 +934,81 @@
                     >
 
                     <small>
-                        Only HTTP and HTTPS website addresses are accepted.
+                        Only HTTP and HTTPS website addresses are allowed.
                     </small>
                 </div>
 
                 <div class="form-field">
-                    <label for="link-category">Category</label>
+                    <label for="application-category">Category</label>
 
-                    <select
-                        id="link-category"
-                        name="linkCategory"
+                    <input
+                        id="application-category"
+                        type="text"
+                        maxlength="30"
+                        list="category-suggestions"
+                        placeholder="University"
+                        required
                     >
-                        <option value="University">University</option>
-                        <option value="Classes">Classes</option>
-                        <option value="Communication">Communication</option>
-                        <option value="Planning">Planning</option>
-                        <option value="Personal">Personal</option>
-                    </select>
+
+                    <datalist id="category-suggestions">
+                        <option value="University"></option>
+                        <option value="Classes"></option>
+                        <option value="Communication"></option>
+                        <option value="Planning"></option>
+                        <option value="Campus"></option>
+                        <option value="Personal"></option>
+                    </datalist>
                 </div>
 
-                <div class="form-field">
-                    <label for="link-icon">Icon</label>
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="application-icon">Icon</label>
 
-                    <select id="link-icon" name="linkIcon">
-                        <option value="🔗">🔗 Link</option>
-                        <option value="🎓">🎓 University</option>
-                        <option value="📚">📚 Classes</option>
-                        <option value="✉️">✉️ Email</option>
-                        <option value="📅">📅 Calendar</option>
-                        <option value="✅">✅ Planning</option>
-                        <option value="💳">💳 Financial</option>
-                        <option value="📍">📍 Location</option>
-                        <option value="💻">💻 Technology</option>
-                    </select>
+                        <select id="application-icon">
+                            <option value="🔗">🔗 Link</option>
+                            <option value="🎓">🎓 University</option>
+                            <option value="📚">📚 Classes</option>
+                            <option value="✉️">✉️ Email</option>
+                            <option value="📅">📅 Calendar</option>
+                            <option value="✅">✅ Planning</option>
+                            <option value="💳">💳 Financial</option>
+                            <option value="📍">📍 Location</option>
+                            <option value="💻">💻 Technology</option>
+                            <option value="📖">📖 Library</option>
+                            <option value="🚌">🚌 Transportation</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field">
+                        <label for="application-color">Card color</label>
+
+                        <select id="application-color">
+                            <option value="blue">Blue</option>
+                            <option value="gold">Gold</option>
+                            <option value="green">Green</option>
+                            <option value="purple">Purple</option>
+                            <option value="red">Red</option>
+                            <option value="slate">Slate</option>
+                        </select>
+                    </div>
                 </div>
+
+                <label class="checkbox-field">
+                    <input id="application-favorite" type="checkbox">
+                    <span>Add to favorites</span>
+                </label>
             </div>
 
-            <p id="link-form-error" class="form-error" role="alert" hidden></p>
+            <p
+                id="application-form-error"
+                class="form-error"
+                role="alert"
+                hidden
+            ></p>
 
             <div class="dialog__actions">
                 <button
-                    id="cancel-link-button"
+                    id="cancel-application-button"
                     class="secondary-button"
                     type="button"
                 >
@@ -697,7 +1016,7 @@
                 </button>
 
                 <button class="primary-button" type="submit">
-                    Save link
+                    Save application
                 </button>
             </div>
         </form>
@@ -711,6 +1030,7 @@
         hidden
     ></div>
 
+    <script src="js/data.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/links.js"></script>
     <script src="js/tasks.js"></script>
