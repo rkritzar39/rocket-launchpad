@@ -1,98 +1,28 @@
 "use strict";
 
 const RocketStorage = (() => {
-    const STORAGE_KEYS = Object.freeze({
-        links: "rocketLaunchpad.links",
+    const KEYS = Object.freeze({
+        applications: "rocketLaunchpad.applications",
         tasks: "rocketLaunchpad.tasks",
         settings: "rocketLaunchpad.settings"
     });
 
-    const DEFAULT_LINKS = Object.freeze([
-        {
-            id: "default-myut",
-            name: "myUT Portal",
-            url: "https://myut.utoledo.edu/",
-            category: "University",
-            icon: "🎓",
-            protected: true
-        },
-        {
-            id: "default-blackboard",
-            name: "Blackboard",
-            url: "https://blackboard.utdl.edu/",
-            category: "Classes",
-            icon: "📚",
-            protected: true
-        },
-        {
-            id: "default-email",
-            name: "Rocket Email",
-            url: "https://outlook.office.com/",
-            category: "Communication",
-            icon: "✉️",
-            protected: true
-        },
-        {
-            id: "default-calendar",
-            name: "Academic Calendar",
-            url: "https://www.utoledo.edu/offices/provost/calendar/",
-            category: "Planning",
-            icon: "📅",
-            protected: true
-        },
-        {
-            id: "default-library",
-            name: "University Libraries",
-            url: "https://www.utoledo.edu/library/",
-            category: "University",
-            icon: "📖",
-            protected: true
-        },
-        {
-            id: "default-map",
-            name: "Campus Map",
-            url: "https://www.utoledo.edu/campus/directions/",
-            category: "University",
-            icon: "📍",
-            protected: true
-        }
-    ]);
-
-    const DEFAULT_TASKS = Object.freeze([
-        {
-            id: "default-task-blackboard",
-            title: "Review Blackboard announcements",
-            dueDate: "",
-            completed: false
-        },
-        {
-            id: "default-task-email",
-            title: "Check Rocket Email",
-            dueDate: "",
-            completed: false
-        }
-    ]);
-
-    const DEFAULT_SETTINGS = Object.freeze({
-        theme: "light"
-    });
-
-    function cloneData(data) {
-        return JSON.parse(JSON.stringify(data));
+    function clone(value) {
+        return JSON.parse(JSON.stringify(value));
     }
 
     function read(key, fallback) {
         try {
-            const storedValue = localStorage.getItem(key);
+            const value = localStorage.getItem(key);
 
-            if (storedValue === null) {
-                return cloneData(fallback);
+            if (value === null) {
+                return clone(fallback);
             }
 
-            return JSON.parse(storedValue);
+            return JSON.parse(value);
         } catch (error) {
-            console.error(`Could not read "${key}" from localStorage.`, error);
-            return cloneData(fallback);
+            console.error(`Unable to read ${key}.`, error);
+            return clone(fallback);
         }
     }
 
@@ -101,71 +31,71 @@ const RocketStorage = (() => {
             localStorage.setItem(key, JSON.stringify(value));
             return true;
         } catch (error) {
-            console.error(`Could not save "${key}" to localStorage.`, error);
+            console.error(`Unable to save ${key}.`, error);
             return false;
         }
     }
 
-    function getLinks() {
-        const links = read(STORAGE_KEYS.links, DEFAULT_LINKS);
+    function getApplications() {
+        const applications = read(
+            KEYS.applications,
+            RocketData.applications
+        );
 
-        if (!Array.isArray(links)) {
-            return cloneData(DEFAULT_LINKS);
-        }
-
-        return links;
+        return Array.isArray(applications)
+            ? applications
+            : clone(RocketData.applications);
     }
 
-    function saveLinks(links) {
-        return write(STORAGE_KEYS.links, links);
+    function saveApplications(applications) {
+        return write(KEYS.applications, applications);
     }
 
     function getTasks() {
-        const tasks = read(STORAGE_KEYS.tasks, DEFAULT_TASKS);
+        const tasks = read(KEYS.tasks, RocketData.tasks);
 
-        if (!Array.isArray(tasks)) {
-            return cloneData(DEFAULT_TASKS);
-        }
-
-        return tasks;
+        return Array.isArray(tasks)
+            ? tasks
+            : clone(RocketData.tasks);
     }
 
     function saveTasks(tasks) {
-        return write(STORAGE_KEYS.tasks, tasks);
+        return write(KEYS.tasks, tasks);
     }
 
     function getSettings() {
-        const settings = read(STORAGE_KEYS.settings, DEFAULT_SETTINGS);
+        const settings = read(KEYS.settings, RocketData.settings);
 
         if (
             typeof settings !== "object" ||
             settings === null ||
             Array.isArray(settings)
         ) {
-            return cloneData(DEFAULT_SETTINGS);
+            return clone(RocketData.settings);
         }
 
         return {
-            ...cloneData(DEFAULT_SETTINGS),
+            ...clone(RocketData.settings),
             ...settings
         };
     }
 
     function saveSettings(settings) {
-        return write(STORAGE_KEYS.settings, settings);
+        return write(KEYS.settings, settings);
     }
 
     function exportData() {
         return {
+            application: "Rocket Launchpad",
             version: 1,
             exportedAt: new Date().toISOString(),
-            links: getLinks(),
+            applications: getApplications(),
             tasks: getTasks(),
             settings: getSettings()
         };
     }
 
-    function validateImportedData(data) {
+    function validateImport(data) {
         if (
             typeof data !== "object" ||
             data === null ||
@@ -174,7 +104,10 @@ const RocketStorage = (() => {
             return false;
         }
 
-        if (!Array.isArray(data.links) || !Array.isArray(data.tasks)) {
+        if (
+            !Array.isArray(data.applications) ||
+            !Array.isArray(data.tasks)
+        ) {
             return false;
         }
 
@@ -190,27 +123,29 @@ const RocketStorage = (() => {
     }
 
     function importData(data) {
-        if (!validateImportedData(data)) {
-            throw new Error("The selected file is not a valid backup.");
+        if (!validateImport(data)) {
+            throw new Error(
+                "The selected file is not a valid Rocket Launchpad backup."
+            );
         }
 
-        saveLinks(data.links);
+        saveApplications(data.applications);
         saveTasks(data.tasks);
         saveSettings({
-            ...cloneData(DEFAULT_SETTINGS),
+            ...clone(RocketData.settings),
             ...data.settings
         });
     }
 
     function resetAll() {
-        saveLinks(cloneData(DEFAULT_LINKS));
-        saveTasks(cloneData(DEFAULT_TASKS));
-        saveSettings(cloneData(DEFAULT_SETTINGS));
+        saveApplications(clone(RocketData.applications));
+        saveTasks(clone(RocketData.tasks));
+        saveSettings(clone(RocketData.settings));
     }
 
     return Object.freeze({
-        getLinks,
-        saveLinks,
+        getApplications,
+        saveApplications,
         getTasks,
         saveTasks,
         getSettings,
