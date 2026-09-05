@@ -1,11 +1,18 @@
 "use strict";
 
 const RocketLinks = (() => {
-    let links = [];
+    let applications = [];
     let searchQuery = "";
+    let categoryFilter = "all";
+    let currentLayout = "grid";
 
     function initialize() {
-        links = RocketStorage.getLinks();
+        applications = RocketStorage.getApplications();
+
+        const settings = RocketStorage.getSettings();
+        currentLayout =
+            settings.applicationLayout === "list" ? "list" : "grid";
+
         render();
     }
 
@@ -17,11 +24,20 @@ const RocketLinks = (() => {
             return crypto.randomUUID();
         }
 
-        return `link-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+        return `app-${Date.now()}-${Math.random()
+            .toString(16)
+            .slice(2)}`;
+    }
+
+    function cleanText(value, maximumLength) {
+        return String(value ?? "")
+            .trim()
+            .replace(/\s+/g, " ")
+            .slice(0, maximumLength);
     }
 
     function normalizeUrl(value) {
-        const trimmedValue = value.trim();
+        const trimmedValue = String(value ?? "").trim();
 
         if (!trimmedValue) {
             throw new Error("Enter a website address.");
@@ -40,207 +56,481 @@ const RocketLinks = (() => {
         }
 
         if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-            throw new Error("Only HTTP and HTTPS links are supported.");
+            throw new Error(
+                "Only HTTP and HTTPS website addresses are supported."
+            );
         }
 
         return parsedUrl.href;
     }
 
-    function cleanText(value, maximumLength) {
-        return String(value ?? "")
-            .trim()
-            .replace(/\s+/g, " ")
-            .slice(0, maximumLength);
+    function save() {
+        RocketStorage.saveApplications(applications);
     }
 
-    function addLink(linkData) {
-        const name = cleanText(linkData.name, 60);
-        const category = cleanText(linkData.category, 30) || "Personal";
-        const icon = cleanText(linkData.icon, 4) || "🔗";
+    function addApplication(applicationData) {
+        const name = cleanText(applicationData.name, 60);
+        const category =
+            cleanText(applicationData.category, 30) || "Personal";
 
         if (!name) {
-            throw new Error("Enter a name for this link.");
+            throw new Error("Enter an application name.");
         }
 
-        const url = normalizeUrl(linkData.url);
-
-        const newLink = {
+        const application = {
             id: createId(),
             name,
-            url,
+            url: normalizeUrl(applicationData.url),
             category,
-            icon,
-            protected: false
+            icon: cleanText(applicationData.icon, 4) || "🔗",
+            color: cleanText(applicationData.color, 20) || "blue",
+            favorite: Boolean(applicationData.favorite),
+            custom: true,
+            openCount: 0,
+            lastOpenedAt: null
         };
 
-        links.push(newLink);
-        RocketStorage.saveLinks(links);
+        applications.push(application);
+        save();
         render();
 
-        return newLink;
+        return application;
     }
 
-    function removeLink(linkId) {
-        const link = links.find((item) => item.id === linkId);
+    function updateApplication(applicationId, applicationData) {
+        const index = applications.findIndex(
+            (application) => application.id === applicationId
+        );
 
-        if (!link) {
+        if (index === -1) {
+            throw new Error("The application could not be found.");
+        }
+
+        const name = cleanText(applicationData.name, 60);
+        const category =
+            cleanText(applicationData.category, 30) || "Personal";
+
+        if (!name) {
+            throw new Error("Enter an application name.");
+        }
+
+        applications[index] = {
+            ...applications[index],
+            name,
+            url: normalizeUrl(applicationData.url),
+            category,
+            icon: cleanText(applicationData.icon, 4) || "🔗",
+            color: cleanText(applicationData.color, 20) || "blue",
+            favorite: Boolean(applicationData.favorite)
+        };
+
+        save();
+        render();
+
+        return applications[index];
+    }
+
+    function getApplication(applicationId) {
+        return applications.find(
+            (application) => application.id === applicationId
+        );
+    }
+
+    function removeApplication(applicationId) {
+        const application = getApplication(applicationId);
+
+        if (!application) {
             return false;
         }
 
         const approved = window.confirm(
-            `Remove "${link.name}" from your launchpad?`
+            `Remove "${application.name}" from Rocket Launchpad?`
         );
 
         if (!approved) {
             return false;
         }
 
-        links = links.filter((item) => item.id !== linkId);
-        RocketStorage.saveLinks(links);
+        applications = applications.filter(
+            (item) => item.id !== applicationId
+        );
+
+        save();
         render();
 
         return true;
     }
 
-    function setSearchQuery(value) {
+    function toggleFavorite(applicationId) {
+        applications = applications.map((application) => {
+            if (application.id !== applicationId) {
+                return application;
+            }
+
+            return {
+                ...application,
+                favorite: !application.favorite
+            };
+        });
+
+        save();
+        render();
+    }
+
+    function recordOpen(applicationId) {
+        applications = applications.map((application) => {
+            if (application.id !== applicationId) {
+                return application;
+            }
+
+            return {
+                ...application,
+                openCount: Number(application.openCount || 0) + 1,
+                lastOpenedAt: new Date().toISOString()
+            };
+        });
+
+        save();
+        render();
+    }
+
+    function setSearch(value) {
         searchQuery = String(value ?? "").trim().toLowerCase();
         render();
     }
 
-    function getFilteredLinks() {
-        if (!searchQuery) {
-            return [...links];
-        }
+    function setCategory(value) {
+        categoryFilter = String(value ?? "all");
+        render();
+    }
 
-        return links.filter((link) => {
-            const searchableText = [
-                link.name,
-                link.category,
-                link.url
-            ]
-                .join(" ")
-                .toLowerCase();
+    function clearFilters() {
+        searchQuery = "";
+        categoryFilter = "all";
+        render();
+    }
 
-            return searchableText.includes(searchQuery);
+    function setLayout(layout) {
+        currentLayout = layout === "list" ? "list" : "grid";
+
+        const settings = RocketStorage.getSettings();
+        settings.applicationLayout = currentLayout;
+        RocketStorage.saveSettings(settings);
+
+        render();
+    }
+
+    function getFilteredApplications() {
+        return applications.filter((application) => {
+            const matchesSearch =
+                !searchQuery ||
+                [
+                    application.name,
+                    application.category,
+                    application.url
+                ]
+                    .join(" ")
+                    .toLowerCase()
+                    .includes(searchQuery);
+
+            const matchesCategory =
+                categoryFilter === "all" ||
+                (categoryFilter === "favorites" &&
+                    application.favorite) ||
+                application.category === categoryFilter;
+
+            return matchesSearch && matchesCategory;
         });
     }
 
-    function createLinkCard(link) {
+    function createCard(application, allowEditing = true) {
         const card = document.createElement("article");
-        card.className = "link-card";
+        card.className = "application-card";
 
         const top = document.createElement("div");
-        top.className = "link-card__top";
+        top.className = "application-card__top";
 
         const icon = document.createElement("span");
-        icon.className = "link-card__icon";
+        icon.className =
+            `application-card__icon ` +
+            `application-card__icon--${application.color || "blue"}`;
+
         icon.setAttribute("aria-hidden", "true");
-        icon.textContent = link.icon || "🔗";
+        icon.textContent = application.icon || "🔗";
 
-        const deleteButton = document.createElement("button");
-        deleteButton.className = "link-card__delete";
-        deleteButton.type = "button";
-        deleteButton.setAttribute(
+        const actions = document.createElement("div");
+        actions.className = "application-card__actions";
+
+        const favoriteButton = document.createElement("button");
+        favoriteButton.className = application.favorite
+            ? "card-action-button card-action-button--favorite"
+            : "card-action-button";
+
+        favoriteButton.type = "button";
+        favoriteButton.title = application.favorite
+            ? "Remove from favorites"
+            : "Add to favorites";
+
+        favoriteButton.setAttribute(
             "aria-label",
-            `Remove ${link.name} from the launchpad`
+            application.favorite
+                ? `Remove ${application.name} from favorites`
+                : `Add ${application.name} to favorites`
         );
-        deleteButton.title = "Remove link";
-        deleteButton.textContent = "×";
 
-        deleteButton.addEventListener("click", () => {
-            const removed = removeLink(link.id);
+        favoriteButton.textContent = application.favorite ? "★" : "☆";
 
-            if (
-                removed &&
-                typeof RocketApp !== "undefined" &&
-                typeof RocketApp.showToast === "function"
-            ) {
-                RocketApp.showToast("Link removed.");
-            }
+        favoriteButton.addEventListener("click", () => {
+            toggleFavorite(application.id);
         });
 
-        top.append(icon, deleteButton);
+        actions.append(favoriteButton);
 
-        const content = document.createElement("div");
-        content.className = "link-card__content";
+        if (allowEditing) {
+            const editButton = document.createElement("button");
+            editButton.className = "card-action-button";
+            editButton.type = "button";
+            editButton.title = "Edit application";
+            editButton.setAttribute(
+                "aria-label",
+                `Edit ${application.name}`
+            );
+            editButton.textContent = "✎";
 
-        const anchor = document.createElement("a");
-        anchor.href = link.url;
-        anchor.target = "_blank";
-        anchor.rel = "noopener noreferrer";
-        anchor.title = `Open ${link.name} in a new tab`;
+            editButton.addEventListener("click", () => {
+                if (
+                    typeof RocketApp !== "undefined" &&
+                    typeof RocketApp.openApplicationDialog === "function"
+                ) {
+                    RocketApp.openApplicationDialog(application.id);
+                }
+            });
 
-        const name = document.createElement("strong");
-        name.textContent = link.name;
+            const deleteButton = document.createElement("button");
+            deleteButton.className = "card-action-button";
+            deleteButton.type = "button";
+            deleteButton.title = "Remove application";
+            deleteButton.setAttribute(
+                "aria-label",
+                `Remove ${application.name}`
+            );
+            deleteButton.textContent = "×";
+
+            deleteButton.addEventListener("click", () => {
+                const removed = removeApplication(application.id);
+
+                if (
+                    removed &&
+                    typeof RocketApp !== "undefined"
+                ) {
+                    RocketApp.showToast("Application removed.");
+                }
+            });
+
+            actions.append(editButton, deleteButton);
+        }
+
+        top.append(icon, actions);
+
+        const body = document.createElement("div");
+        body.className = "application-card__body";
+
+        const link = document.createElement("a");
+        link.className = "application-card__link";
+        link.href = application.url;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.title = `Open ${application.name} in a new tab`;
+
+        link.addEventListener("click", () => {
+            recordOpen(application.id);
+        });
+
+        const name = document.createElement("span");
+        name.className = "application-card__name";
+        name.textContent = application.name;
 
         const externalIcon = document.createElement("span");
-        externalIcon.className = "link-card__external-icon";
+        externalIcon.className = "application-card__external";
         externalIcon.setAttribute("aria-hidden", "true");
         externalIcon.textContent = "↗";
 
-        anchor.append(name, externalIcon);
+        link.append(name, externalIcon);
 
         const category = document.createElement("span");
-        category.className = "link-card__category";
-        category.textContent = link.category || "Personal";
+        category.className = "application-card__category";
+        category.textContent = application.category || "Personal";
 
-        content.append(anchor, category);
-        card.append(top, content);
+        body.append(link, category);
+        card.append(top, body);
 
         return card;
     }
 
-    function renderGrid(gridId, emptyStateId, maximumItems = null) {
-        const grid = document.getElementById(gridId);
-        const emptyState = document.getElementById(emptyStateId);
+    function renderCards(
+        containerId,
+        emptyId,
+        items,
+        allowEditing = true
+    ) {
+        const container = document.getElementById(containerId);
+        const emptyState = document.getElementById(emptyId);
 
-        if (!grid || !emptyState) {
+        if (!container || !emptyState) {
             return;
         }
 
-        grid.replaceChildren();
+        container.replaceChildren();
 
-        let visibleLinks = getFilteredLinks();
-
-        if (Number.isInteger(maximumItems)) {
-            visibleLinks = visibleLinks.slice(0, maximumItems);
-        }
-
-        visibleLinks.forEach((link) => {
-            grid.append(createLinkCard(link));
+        items.forEach((application) => {
+            container.append(createCard(application, allowEditing));
         });
 
-        const isEmpty = visibleLinks.length === 0;
-
-        grid.hidden = isEmpty;
+        const isEmpty = items.length === 0;
+        container.hidden = isEmpty;
         emptyState.hidden = !isEmpty;
     }
 
+    function renderCategories() {
+        const categorySelect = document.getElementById("category-filter");
+
+        if (!categorySelect) {
+            return;
+        }
+
+        const selectedValue = categoryFilter;
+
+        const categories = [
+            ...new Set(
+                applications
+                    .map((application) => application.category)
+                    .filter(Boolean)
+            )
+        ].sort((first, second) => first.localeCompare(second));
+
+        categorySelect.replaceChildren();
+
+        const allOption = new Option("All categories", "all");
+        const favoritesOption = new Option("Favorites", "favorites");
+
+        categorySelect.add(allOption);
+        categorySelect.add(favoritesOption);
+
+        categories.forEach((category) => {
+            categorySelect.add(new Option(category, category));
+        });
+
+        const availableValues = Array.from(categorySelect.options).map(
+            (option) => option.value
+        );
+
+        categorySelect.value = availableValues.includes(selectedValue)
+            ? selectedValue
+            : "all";
+    }
+
+    function renderLayoutControls() {
+        const allAppsGrid = document.getElementById("all-apps-grid");
+        const gridButton = document.getElementById("grid-view-button");
+        const listButton = document.getElementById("list-view-button");
+        const defaultLayoutSelect = document.getElementById(
+            "default-layout-select"
+        );
+
+        allAppsGrid?.classList.toggle(
+            "application-grid--list",
+            currentLayout === "list"
+        );
+
+        gridButton?.classList.toggle(
+            "view-toggle__button--active",
+            currentLayout === "grid"
+        );
+
+        listButton?.classList.toggle(
+            "view-toggle__button--active",
+            currentLayout === "list"
+        );
+
+        if (defaultLayoutSelect) {
+            defaultLayoutSelect.value = currentLayout;
+        }
+    }
+
     function render() {
-        renderGrid("quick-links-grid", "quick-links-empty", 6);
-        renderGrid("all-links-grid", "all-links-empty");
+        renderCategories();
+
+        const favorites = applications
+            .filter((application) => application.favorite)
+            .slice(0, 6);
+
+        const recent = applications
+            .filter((application) => application.lastOpenedAt)
+            .sort(
+                (first, second) =>
+                    new Date(second.lastOpenedAt).getTime() -
+                    new Date(first.lastOpenedAt).getTime()
+            )
+            .slice(0, 4);
+
+        const filteredApplications = getFilteredApplications();
+
+        renderCards(
+            "favorite-apps-grid",
+            "favorite-apps-empty",
+            favorites,
+            false
+        );
+
+        renderCards(
+            "recent-apps-grid",
+            "recent-apps-empty",
+            recent,
+            false
+        );
+
+        renderCards(
+            "all-apps-grid",
+            "all-apps-empty",
+            filteredApplications,
+            true
+        );
+
+        const resultCount = document.getElementById(
+            "applications-result-count"
+        );
+
+        if (resultCount) {
+            const count = filteredApplications.length;
+
+            resultCount.textContent =
+                `${count} ${count === 1
+                    ? "application"
+                    : "applications"}`;
+        }
+
+        renderLayoutControls();
     }
 
     function reload() {
-        links = RocketStorage.getLinks();
-        render();
-    }
+        applications = RocketStorage.getApplications();
 
-    function clearSearch() {
-        searchQuery = "";
-        render();
-    }
+        const settings = RocketStorage.getSettings();
+        currentLayout =
+            settings.applicationLayout === "list" ? "list" : "grid";
 
-    function getSearchQuery() {
-        return searchQuery;
+        render();
     }
 
     return Object.freeze({
         initialize,
-        addLink,
-        setSearchQuery,
-        clearSearch,
-        getSearchQuery,
+        addApplication,
+        updateApplication,
+        getApplication,
+        setSearch,
+        setCategory,
+        clearFilters,
+        setLayout,
         reload,
         render
     });
